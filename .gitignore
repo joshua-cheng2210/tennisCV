@@ -1,5 +1,7 @@
 models/
 runs/
-training/
+training/*.pt
+training/tennis-ball-detection-6
+training/config.py
 0.5.12
 *.pt
