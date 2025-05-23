@@ -1,2 +1,0 @@
-ultralytics
-numpy>=1.21.0,<1.22.0  # Example of specifying a compatible version range
