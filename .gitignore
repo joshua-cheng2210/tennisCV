@@ -1,0 +1,13 @@
+court_line_detector/__pycache__/
+models/
+# output_videos/
+runs/
+tracker_stubs/
+trackers/__pycache__/
+training/runs/
+training/tennis_court_det_dataset/
+training/tennis-ball-detection-6/
+training/config.py
+training/*.pt
+utils/__pycache__/
+*.pt
