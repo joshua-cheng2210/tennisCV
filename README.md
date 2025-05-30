@@ -15,6 +15,7 @@
 - learn the differences here https://www.kaggle.com/discussions/getting-started/561774
 - get some introduction to some libraries like torch, torchvision, opencv to train tennis court keypoint detection. (TODO: check more how to use them)
 - a new method of computer vision called keypoint detection, which is used to detect the keypoints of the tennis court
+- after getting all the models you need, you can finally proceed to evaluating your gameplay
 
 # topics to look up
 - fully connected neural networks: each neuron in one layer is connected to every neuron in the next layer
