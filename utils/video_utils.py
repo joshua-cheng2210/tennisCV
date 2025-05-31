@@ -1,5 +1,5 @@
 import cv2
-
+import moviepy
 # Reads a video file and returns its frames as a list of images
 def read_video(video_path):
     cap = cv2.VideoCapture(video_path)
@@ -19,3 +19,13 @@ def save_video(output_video_frames, output_video_path):
     for frame in output_video_frames:
         out.write(frame)
     out.release()
+
+def convert_avi_to_mp4(avi_path, mp4_path):
+    try:
+        clip = moviepy.VideoFileClip(avi_path)
+        clip.write_videofile(mp4_path, codec="libx264")
+        clip.close()
+        return True
+    except Exception as e:
+        print(f"Error converting {avi_path} to {mp4_path}: {e}")
+        return False

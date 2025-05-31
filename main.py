@@ -1,5 +1,6 @@
 from utils import (read_video, 
                    save_video,
+                   convert_avi_to_mp4,
                 #    measure_distance,
                 #    draw_player_stats,
                 #    convert_pixel_distance_to_meters
@@ -131,10 +132,11 @@ def main():
     # output_video_frames = draw_player_stats(output_video_frames,player_stats_data_df)
 
     # ## Draw frame number on top left corner
-    # for i, frame in enumerate(output_video_frames):
-    #     cv2.putText(frame, f"Frame: {i}",(10,30),cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+    for i, frame in enumerate(output_video_frames):
+        cv2.putText(frame, f"Frame: {i}",(10,30),cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
 
     save_video(output_video_frames, "output_videos/output_video.avi")
+    convert_avi_to_mp4("output_videos/output_video.avi", "output_videos/output_video.mp4")
 
 if __name__ == "__main__":
     main()

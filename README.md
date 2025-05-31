@@ -16,6 +16,8 @@
 - get some introduction to some libraries like torch, torchvision, opencv to train tennis court keypoint detection. (TODO: check more how to use them)
 - a new method of computer vision called keypoint detection, which is used to detect the keypoints of the tennis court
 - after getting all the models you need, you can finally proceed to evaluating your gameplay
+- had some troubles with git pushing stuff when i tried to upload the input images and videos. (solutions: remove the .git from the current working folder --> git clone from the repo again --> move the .git file from that newly cloned repo to working folder -> should be back working)
+- how to fill in missing Rows in a pandas table. use .interpolate() or .ffill() or .bfill() methods
 
 # topics to look up
 - fully connected neural networks: each neuron in one layer is connected to every neuron in the next layer

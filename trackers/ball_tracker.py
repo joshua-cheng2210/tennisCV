@@ -1,41 +1,57 @@
 from ultralytics import YOLO 
 import cv2
 import pickle
-import sys
-sys.path.append('../')
-# from utils import measure_distance, get_center_of_bbox
-
+import pandas as pd
 class BallTracker:
     def __init__(self,model_path):
         self.model = YOLO(model_path)
 
-    def choose_and_filter_balls(self, court_keypoints, ball_detections):
-        ball_detections_first_frame = ball_detections[0]
-        chosen_ball = self.choose_balls(court_keypoints, ball_detections_first_frame)
-        filtered_ball_detections = []
-        for ball_dict in ball_detections:
-            filtered_ball_dict = {track_id: bbox for track_id, bbox in ball_dict.items() if track_id in chosen_ball}
-            filtered_ball_detections.append(filtered_ball_dict)
-        return filtered_ball_detections
+    def interpolate_ball_positions(self, ball_positions):
+        ball_positions = [x.get(1,[]) for x in ball_positions]
+        # convert the list into pandas dataframe
+        df_ball_positions = pd.DataFrame(ball_positions,columns=['x1','y1','x2','y2']) # ['x1','y1','x2','y2'] is not 2 coords. its the bounding box coordinates
 
-    def choose_balls(self, court_keypoints, ball_dict):
-        distances = []
-        for track_id, bbox in ball_dict.items():
-            ball_center = get_center_of_bbox(bbox)
+        # interpolate the missing values
+        df_ball_positions = df_ball_positions.interpolate()
+        df_ball_positions = df_ball_positions.bfill()
+        df_ball_positions = df_ball_positions.ffill()
 
-            min_distance = float('inf')
-            for i in range(0,len(court_keypoints),2):
-                court_keypoint = (court_keypoints[i], court_keypoints[i+1])
-                distance = measure_distance(ball_center, court_keypoint)
-                if distance < min_distance:
-                    min_distance = distance
-            distances.append((track_id, min_distance))
-        
-        # sorrt the distances in ascending order
-        distances.sort(key = lambda x: x[1])
-        # Choose the first 2 tracks
-        chosen_balls = [distances[0][0], distances[1][0]]
-        return chosen_balls
+        ball_positions = [{1:x} for x in df_ball_positions.to_numpy().tolist()]
+
+        return ball_positions
+
+    def get_ball_shot_frames(self,ball_positions):
+        ball_positions = [x.get(1,[]) for x in ball_positions]
+        # convert the list into pandas dataframe
+        df_ball_positions = pd.DataFrame(ball_positions,columns=['x1','y1','x2','y2'])
+
+        df_ball_positions['ball_hit'] = 0
+
+        df_ball_positions['mid_y'] = (df_ball_positions['y1'] + df_ball_positions['y2'])/2
+        df_ball_positions['mid_y_rolling_mean'] = df_ball_positions['mid_y'].rolling(window=5, min_periods=1, center=False).mean()
+        df_ball_positions['delta_y'] = df_ball_positions['mid_y_rolling_mean'].diff()
+        minimum_change_frames_for_hit = 25
+        for i in range(1,len(df_ball_positions)- int(minimum_change_frames_for_hit*1.2) ):
+            negative_position_change = df_ball_positions['delta_y'].iloc[i] >0 and df_ball_positions['delta_y'].iloc[i+1] <0
+            positive_position_change = df_ball_positions['delta_y'].iloc[i] <0 and df_ball_positions['delta_y'].iloc[i+1] >0
+
+            if negative_position_change or positive_position_change:
+                change_count = 0 
+                for change_frame in range(i+1, i+int(minimum_change_frames_for_hit*1.2)+1):
+                    negative_position_change_following_frame = df_ball_positions['delta_y'].iloc[i] >0 and df_ball_positions['delta_y'].iloc[change_frame] <0
+                    positive_position_change_following_frame = df_ball_positions['delta_y'].iloc[i] <0 and df_ball_positions['delta_y'].iloc[change_frame] >0
+
+                    if negative_position_change and negative_position_change_following_frame:
+                        change_count+=1
+                    elif positive_position_change and positive_position_change_following_frame:
+                        change_count+=1
+            
+                if change_count>minimum_change_frames_for_hit-1:
+                    df_ball_positions['ball_hit'].iloc[i] = 1
+
+        frame_nums_with_ball_hits = df_ball_positions[df_ball_positions['ball_hit']==1].index.tolist()
+
+        return frame_nums_with_ball_hits
 
     def detect_frames(self,frames, read_from_stub=False, stub_path=None):
         ball_detections = []
@@ -65,8 +81,8 @@ class BallTracker:
         
         return ball_detections
 
-    def detect_frame(self,frame):
-        results = self.model.predict(frame,conf=0.15)[0]
+    def detect_frame(self,frame, _conf=0.15):
+        results = self.model.predict(frame, conf=_conf)[0]
 
         ball_dict = {}
         for box in results.boxes:
