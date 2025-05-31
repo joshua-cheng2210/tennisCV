@@ -13,12 +13,15 @@ def read_video(video_path):
     return frames
 
 # Save a list of video frames to a file
-def save_video(output_video_frames, output_video_path):
+def save_video(output_video_frames, output_video_path, mp4=False):
     fourcc = cv2.VideoWriter_fourcc(*'MJPG')
     out = cv2.VideoWriter(output_video_path, fourcc, 24, (output_video_frames[0].shape[1], output_video_frames[0].shape[0]))
     for frame in output_video_frames:
         out.write(frame)
     out.release()
+
+    if mp4:
+        convert_avi_to_mp4(output_video_path, output_video_path.replace('.avi', '.mp4'))
 
 def convert_avi_to_mp4(avi_path, mp4_path):
     try:

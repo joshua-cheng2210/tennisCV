@@ -3,13 +3,15 @@ import cv2
 import pickle
 import sys
 sys.path.append('../')
-# from utils import measure_distance, get_center_of_bbox
+from utils import measure_distance, get_center_of_bbox
 
 class PlayerTracker:
     def __init__(self,model_path):
         self.model = YOLO(model_path)
 
     def choose_and_filter_players(self, court_keypoints, player_detections):
+        # print("court_keypoints: ", court_keypoints)
+        # print("player_detections: ", player_detections[0:10])
         player_detections_first_frame = player_detections[0]
         chosen_player = self.choose_players(court_keypoints, player_detections_first_frame)
         filtered_player_detections = []
@@ -18,6 +20,7 @@ class PlayerTracker:
             filtered_player_detections.append(filtered_player_dict)
         return filtered_player_detections
 
+    # its determining which player is the closest too all fo the court keypoints. (future development, make it whos closer to the tennis racket instead)
     def choose_players(self, court_keypoints, player_dict):
         distances = []
         for track_id, bbox in player_dict.items():
@@ -28,11 +31,13 @@ class PlayerTracker:
                 court_keypoint = (court_keypoints[i], court_keypoints[i+1])
                 distance = measure_distance(player_center, court_keypoint)
                 if distance < min_distance:
+                    # print(f"track_id: {track_id}; court keypoint: ({i}, {i + 1}); distance: {distance}")
                     min_distance = distance
             distances.append((track_id, min_distance))
         
-        # sorrt the distances in ascending order
+        # sort the distances in ascending order
         distances.sort(key = lambda x: x[1])
+        # print("distances:" , distances)
         # Choose the first 2 tracks
         chosen_players = [distances[0][0], distances[1][0]]
         return chosen_players

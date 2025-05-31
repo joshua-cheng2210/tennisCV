@@ -5,11 +5,14 @@ import pandas as pd
 class BallTracker:
     def __init__(self,model_path):
         self.model = YOLO(model_path)
+        self.interpolated_positions = []
 
     def interpolate_ball_positions(self, ball_positions):
         ball_positions = [x.get(1,[]) for x in ball_positions]
         # convert the list into pandas dataframe
         df_ball_positions = pd.DataFrame(ball_positions,columns=['x1','y1','x2','y2']) # ['x1','y1','x2','y2'] is not 2 coords. its the bounding box coordinates
+
+        self.interpolated_positions = df_ball_positions.isnull().any(axis=1)
 
         # interpolate the missing values
         df_ball_positions = df_ball_positions.interpolate()
@@ -17,6 +20,9 @@ class BallTracker:
         df_ball_positions = df_ball_positions.ffill()
 
         ball_positions = [{1:x} for x in df_ball_positions.to_numpy().tolist()]
+
+        # for i, x in enumerate(df_ball_positions.to_numpy().tolist()):
+        #     print(f"frame {i}: iterpolated = {self.interpolated_positions[i]}: {x}")
 
         return ball_positions
 
@@ -93,13 +99,21 @@ class BallTracker:
 
     def draw_bboxes(self,video_frames, ball_detections):
         output_video_frames = []
+        index = 0
         for frame, ball_dict in zip(video_frames, ball_detections):
             # Draw Bounding Boxes
             for track_id, bbox in ball_dict.items():
                 x1, y1, x2, y2 = bbox
-                cv2.putText(frame, f"Ball ID: {track_id}",(int(bbox[0]),int(bbox[1] -10 )),cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 255, 255), 2)
-                cv2.rectangle(frame, (int(x1), int(y1)), (int(x2), int(y2)), (0, 255, 255), 2)
+                if self.interpolated_positions[index]:
+                    color = (255, 165, 0)
+                    cv2.putText(frame, f"Ball ID: {track_id}; interpolated: 1",(int(bbox[0]),int(bbox[1] -10 )),cv2.FONT_HERSHEY_SIMPLEX, 0.9, color, 2)
+                    cv2.rectangle(frame, (int(x1), int(y1)), (int(x2), int(y2)), color, 2)
+                else:
+                    color = (0, 255, 255)
+                    cv2.putText(frame, f"Ball ID: {track_id}: interpolated: 0",(int(bbox[0]),int(bbox[1] -10 )),cv2.FONT_HERSHEY_SIMPLEX, 0.9, color, 2)
+                    cv2.rectangle(frame, (int(x1), int(y1)), (int(x2), int(y2)), color, 2)
             output_video_frames.append(frame)
+            index += 1
         
         return output_video_frames
 

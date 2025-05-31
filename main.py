@@ -24,7 +24,7 @@ def main():
 
     player_detections = player_tracker.detect_frames(video_frames, read_from_stub=True, stub_path="tracker_stubs/player_detections.pkl")
     ball_detections = ball_tracker.detect_frames(video_frames, read_from_stub=True, stub_path="tracker_stubs/ball_detections.pkl")
-    # ball_detections = ball_tracker.interpolate_ball_positions(ball_detections)
+    ball_detections = ball_tracker.interpolate_ball_positions(ball_detections)
     
     # # Court Line Detector model
     court_model_path = "models/tennis_court_keypoints_model.pth"
@@ -32,7 +32,7 @@ def main():
     court_keypoints = court_line_detector.predict(video_frames[0])
 
     # # choose players
-    # player_detections = player_tracker.choose_and_filter_players(court_keypoints, player_detections)
+    player_detections = player_tracker.choose_and_filter_players(court_keypoints, player_detections)
 
     # # MiniCourt
     # mini_court = MiniCourt(video_frames[0]) 
@@ -135,8 +135,9 @@ def main():
     for i, frame in enumerate(output_video_frames):
         cv2.putText(frame, f"Frame: {i}",(10,30),cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
 
-    save_video(output_video_frames, "output_videos/output_video.avi")
-    convert_avi_to_mp4("output_videos/output_video.avi", "output_videos/output_video.mp4")
+    save_video(output_video_frames, "output_videos/output_video.avi", mp4=True)
+    # save_video(output_video_frames, "output_videos/output_video.avi")
+    # convert_avi_to_mp4("output_videos/output_video.avi", "output_videos/output_video.mp4")
 
 if __name__ == "__main__":
     main()
