@@ -6,7 +6,7 @@ from utils import (read_video,
                    )
 # import constants
 from trackers import PlayerTracker, BallTracker
-# from court_line_detector import CourtLineDetector
+from court_line_detector import CourtLineDetector
 # from mini_court import MiniCourt
 import cv2
 import pandas as pd
@@ -26,9 +26,9 @@ def main():
     # ball_detections = ball_tracker.interpolate_ball_positions(ball_detections)
     
     # # Court Line Detector model
-    # court_model_path = "models/keypoints_model.pth"
-    # court_line_detector = CourtLineDetector(court_model_path)
-    # court_keypoints = court_line_detector.predict(video_frames[0])
+    court_model_path = "models/tennis_court_keypoints_model.pth"
+    court_line_detector = CourtLineDetector(court_model_path)
+    court_keypoints = court_line_detector.predict(video_frames[0])
 
     # # choose players
     # player_detections = player_tracker.choose_and_filter_players(court_keypoints, player_detections)
@@ -120,7 +120,7 @@ def main():
     output_video_frames = ball_tracker.draw_bboxes(output_video_frames, ball_detections)
 
     # ## Draw court Keypoints
-    # output_video_frames  = court_line_detector.draw_keypoints_on_video(output_video_frames, court_keypoints)
+    output_video_frames  = court_line_detector.draw_keypoints_on_video(output_video_frames, court_keypoints)
 
     # # Draw Mini Court
     # output_video_frames = mini_court.draw_mini_court(output_video_frames)
