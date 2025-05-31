@@ -1,6 +1,6 @@
 court_line_detector/__pycache__/
 # input_videos/
-# input_videos/image.png
+input_videos/image.png
 input_videos/input_videos.mp4
 models/
 output_videos/
