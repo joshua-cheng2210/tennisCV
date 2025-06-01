@@ -1,5 +1,6 @@
 import cv2
 import moviepy
+from tqdm import tqdm
 # Reads a video file and returns its frames as a list of images
 def read_video(video_path):
     cap = cv2.VideoCapture(video_path)
@@ -14,9 +15,10 @@ def read_video(video_path):
 
 # Save a list of video frames to a file
 def save_video(output_video_frames, output_video_path, mp4=False):
+    print("saving video")
     fourcc = cv2.VideoWriter_fourcc(*'MJPG')
     out = cv2.VideoWriter(output_video_path, fourcc, 24, (output_video_frames[0].shape[1], output_video_frames[0].shape[0]))
-    for frame in output_video_frames:
+    for frame in tqdm(output_video_frames, desc="Saving video"):
         out.write(frame)
     out.release()
 

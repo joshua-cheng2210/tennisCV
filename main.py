@@ -12,6 +12,8 @@ from mini_court import MiniCourt
 import cv2
 import pandas as pd
 from copy import deepcopy
+import cProfile
+import pstats
 
 def main():
     # Read Video
@@ -38,7 +40,7 @@ def main():
     mini_court = MiniCourt(video_frames[0]) 
 
     # # Detect ball shots
-    # ball_shot_frames= ball_tracker.get_ball_shot_frames(ball_detections)
+    ball_shot_frames = ball_tracker.get_ball_shot_frames(ball_detections)
 
     # # Convert positions to mini court positions
     # player_mini_court_detections, ball_mini_court_detections = mini_court.convert_bounding_boxes_to_mini_court_coordinates(player_detections, 
@@ -140,4 +142,12 @@ def main():
     # convert_avi_to_mp4("output_videos/output_video.avi", "output_videos/output_video.mp4")
 
 if __name__ == "__main__":
+    # Wrap your main function with cProfile
+    # profiler = cProfile.Profile()
+    # profiler.enable()
     main()
+    # profiler.disable()
+
+    # # Print the profiling results
+    # stats = pstats.Stats(profiler).sort_stats('tottime')
+    # stats.print_stats(10)  # Show the top 10 functions by total time
