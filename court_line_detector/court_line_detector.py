@@ -2,11 +2,14 @@ import torch
 import torchvision.transforms as transforms
 import cv2
 from torchvision import models
+from torchvision.models import ResNet50_Weights
 import numpy as np
+import pickle
 
 class CourtLineDetector:
     def __init__(self, model_path):
         self.model = models.resnet50(pretrained=True)
+        # self.model = models.resnet50(weights=ResNet50_Weights.DEFAULT)
         self.model.fc = torch.nn.Linear(self.model.fc.in_features, 14*2) 
         self.model.load_state_dict(torch.load(model_path, map_location='cpu'))
         self.transform = transforms.Compose([
@@ -16,7 +19,15 @@ class CourtLineDetector:
             transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
         ])
 
-    def predict(self, image):
+    def predict(self, image, read_from_stub=False, stub_path=None):
+        if read_from_stub and stub_path is not None:
+            try:
+                with open(stub_path, 'rb') as f:
+                    court_keypoints = pickle.load(f)
+                return court_keypoints
+            except:
+                pass
+
         image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
         image_tensor = self.transform(image_rgb).unsqueeze(0)
         with torch.no_grad():
@@ -25,6 +36,10 @@ class CourtLineDetector:
         original_h, original_w = image.shape[:2]
         keypoints[::2] *= original_w / 224.0
         keypoints[1::2] *= original_h / 224.0
+
+        if stub_path is not None:
+            with open(stub_path, 'wb') as f:
+                pickle.dump(keypoints, f)
 
         return keypoints
 

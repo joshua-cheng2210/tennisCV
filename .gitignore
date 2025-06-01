@@ -1,7 +1,9 @@
+constants/__pycache__/
 court_line_detector/__pycache__/
 # input_videos/
 # input_videos/image.png
 # input_videos/input_videos.mp4
+mini_court/__pycache__/
 models/
 output_videos/
 # output_videos/output_video.avi

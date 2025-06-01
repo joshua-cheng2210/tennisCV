@@ -105,7 +105,7 @@ class BallTracker:
             for track_id, bbox in ball_dict.items():
                 x1, y1, x2, y2 = bbox
                 if self.interpolated_positions[index]:
-                    color = (255, 165, 0)
+                    color = (0, 165, 255) # bgr format
                     cv2.putText(frame, f"Ball ID: {track_id}; interpolated: 1",(int(bbox[0]),int(bbox[1] -10 )),cv2.FONT_HERSHEY_SIMPLEX, 0.9, color, 2)
                     cv2.rectangle(frame, (int(x1), int(y1)), (int(x2), int(y2)), color, 2)
                 else:
