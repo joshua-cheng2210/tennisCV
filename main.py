@@ -24,7 +24,7 @@ def main():
 
     player_detections = player_tracker.detect_frames(video_frames, read_from_stub=True, stub_path="tracker_stubs/player_detections.pkl")
     ball_detections = ball_tracker.detect_frames(video_frames, read_from_stub=True, stub_path="tracker_stubs/ball_detections.pkl")
-    ball_detections = ball_tracker.interpolate_ball_positions(ball_detections)
+    ball_detections = ball_tracker.interpolate_ball_positions(ball_detections, read_from_stub=True, stub_path="tracker_stubs/ball_detections.pkl")
     
     # # Court Line Detector model
     court_model_path = "models/tennis_court_keypoints_model.pth"

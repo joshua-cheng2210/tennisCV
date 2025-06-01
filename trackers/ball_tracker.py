@@ -7,7 +7,7 @@ class BallTracker:
         self.model = YOLO(model_path)
         self.interpolated_positions = []
 
-    def interpolate_ball_positions(self, ball_positions):
+    def interpolate_ball_positions(self, ball_positions, read_from_stub=False, stub_path=None):
         ball_positions = [x.get(1,[]) for x in ball_positions]
         # convert the list into pandas dataframe
         df_ball_positions = pd.DataFrame(ball_positions,columns=['x1','y1','x2','y2']) # ['x1','y1','x2','y2'] is not 2 coords. its the bounding box coordinates
@@ -23,6 +23,13 @@ class BallTracker:
 
         # for i, x in enumerate(df_ball_positions.to_numpy().tolist()):
         #     print(f"frame {i}: iterpolated = {self.interpolated_positions[i]}: {x}")
+
+        if read_from_stub and stub_path is not None:
+            try:
+                with open(stub_path, 'wb') as f:
+                    pickle.dump(ball_positions, f)
+            except:
+                pass
 
         return ball_positions
 
