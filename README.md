@@ -40,3 +40,11 @@
 - reduce the number of requirements needed to run this
 - scale it to predict
 - try to make it work for real time analysis - even though the script is built to process the full video
+
+# some resume bulletpoints (GPT generated)
+- Developed a computer vision pipeline using YOLOv5 and OpenCV to detect tennis balls and court lines in match videos, enabling objective post-game analysis.
+- Fine-tuned object detection and keypoint models with custom datasets sourced from Roboflow and other repositories, learning to handle domain-specific training challenges and data acquisition.
+- Leveraged Kaggle-provided GPUs (T4 and P100) to accelerate deep learning model training, and gained hands-on experience with PyTorch, torchvision, and large-scale dataset management.
+- Automated frame-by-frame video processing and data extraction with OpenCV and pandas, applying techniques such as interpolation and data imputation to handle missing data.
+- Engineered a system to compute precise player and ball positions relative to the tennis court, laying the foundation for advanced sports analytics and gameplay evaluation.
+- Troubleshot and resolved practical issues in version control (git) and large data uploads, improving workflow efficiency for machine learning experiments.
