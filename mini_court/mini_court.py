@@ -154,11 +154,11 @@ class MiniCourt():
         return self.drawing_key_points
 
     def get_mini_court_coordinates(self,
-                                   object_position,
-                                   closest_key_point, 
+                                   object_position, # pixel unit
+                                   closest_key_point, # pixel unit
                                    closest_key_point_index, 
-                                   player_height_in_pixels,
-                                   player_height_in_meters
+                                   player_height_in_pixels, # pixel unit
+                                   player_height_in_meters # meters unit
                                    ):
         
         distance_from_keypoint_x_pixels, distance_from_keypoint_y_pixels = measure_xy_distance(object_position, closest_key_point)
@@ -187,18 +187,27 @@ class MiniCourt():
         return  mini_court_player_position
 
     def convert_bounding_boxes_to_mini_court_coordinates(self,player_boxes, ball_boxes, original_court_key_points ):
+        # print("player_boxes[0].keys():", player_boxes[0].keys())
         player_heights = {
-            1: constants.PLAYER_1_HEIGHT_METERS,
-            2: constants.PLAYER_2_HEIGHT_METERS
+            list(player_boxes[0].keys())[0]: constants.PLAYER_1_HEIGHT_METERS,
+            list(player_boxes[0].keys())[1]: constants.PLAYER_2_HEIGHT_METERS
         }
+        # player_heights = {}
+        # player_heights[player_ids[0]] = constants.PLAYER_1_HEIGHT_METERS
+        # player_heights[player_ids[1]] = constants.PLAYER_2_HEIGHT_METERS
 
-        output_player_boxes= []
-        output_ball_boxes= []
+
+        minimap_player_points= []
+        minimap_ballpoints= []
 
         for frame_num, player_bbox in enumerate(player_boxes):
             ball_box = ball_boxes[frame_num][1]
             ball_position = get_center_of_bbox(ball_box)
             closest_player_id_to_ball = min(player_bbox.keys(), key=lambda x: measure_distance(ball_position, get_center_of_bbox(player_bbox[x])))
+
+            # player_ids = list(player_bbox.keys())
+            # player_heights[player_ids[0]] = constants.PLAYER_1_HEIGHT_METERS
+            # player_heights[player_ids[1]] = constants.PLAYER_2_HEIGHT_METERS
 
             output_player_bboxes_dict = {}
             for player_id, bbox in player_bbox.items():
@@ -230,16 +239,19 @@ class MiniCourt():
                     closest_key_point = (original_court_key_points[closest_key_point_index*2], 
                                         original_court_key_points[closest_key_point_index*2+1])
                     
-                    mini_court_player_position = self.get_mini_court_coordinates(ball_position,
+                    mini_court_ball_position = self.get_mini_court_coordinates(ball_position,
                                                                             closest_key_point, 
                                                                             closest_key_point_index, 
                                                                             max_player_height_in_pixels,
                                                                             player_heights[player_id]
                                                                             )
-                    output_ball_boxes.append({1:mini_court_player_position})
-            output_player_boxes.append(output_player_bboxes_dict)
+                    minimap_ballpoints.append({1:mini_court_ball_position})
+            minimap_player_points.append(output_player_bboxes_dict)
+        
+        # print("minimap_player_points: ", minimap_player_points)
+        # print("minimap_ballpoints: ", minimap_ballpoints)
 
-        return output_player_boxes , output_ball_boxes
+        return minimap_player_points , minimap_ballpoints
     
     def draw_points_on_mini_court(self,frames,postions, color=(0,255,0)):
         for frame_num, frame in enumerate(frames):
