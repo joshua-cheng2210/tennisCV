@@ -3,7 +3,15 @@
 
 # library used
 - YoloV5: to detect objects
-- opencv
+- opencv: to process the video frames
+- pandas: to handle the data
+- torch: to train the models
+- torchvision: to handle the data and models
+- pickle: to save and load the outputs so that you don't have to run the whole script again. (faster development)
+- cProfiler: to profile the code and see where the bottlenecks are
+- pstats: to analyze the profiling results
+- matplotlib: to visualize the data
+- tqdm: to show the progress of the script
 
 # requirements
 - only works for procesing tennis videos that are recorded from behind the players. (it doesn't work for side views)
